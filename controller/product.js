@@ -30,7 +30,7 @@ const GetProduct = async (req, res) => {
         const query = {
             $match: {
                 ...(type && { typeProduct: type === "null" ? null : type }),
-                ...(type && { discount: sale === "sale" ? null : { $gt: 10 } }),
+                ...(sale && { discount: sale === "sale" ? null : { $gt: 10 } }),
                 $or: [
                     { name: { $regex: search, $options: "i" } }
                 ]
@@ -40,7 +40,7 @@ const GetProduct = async (req, res) => {
         const dataLength = await modelProduct.aggregate([query])
         const total = Math.ceil(dataLength.length / limit);
         return res.status(200).json({
-            data, total
+            data, total, dataLength: dataLength.length
         })
     } catch (error) {
         return res.status(500).json({ error })
