@@ -7,5 +7,5 @@ const SchemaProduct = new Schema({
     desc: String,
     typeProduct: String,
     picture: [String]
-}, { timestamp: true }, { collection: "products" })
+}, { timestamps: true }, { collection: "products" })
 module.exports = mongoose.model("products", SchemaProduct)

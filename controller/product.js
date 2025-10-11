@@ -3,7 +3,7 @@ const modelProduct = require('../model/product')
 const CreateProduct = async (req, res) => {
     try {
         const { name, price, discount, typeProduct, desc, picture } = req.body
-          if (!name|| !price|| !discount|| !typeProduct|| !desc|| !picture) {
+        if (!name || !price || !discount || !typeProduct || !desc || !picture) {
             return res.status(404).json({
                 message: "Information is missing"
             })
@@ -23,10 +23,14 @@ const CreateProduct = async (req, res) => {
 const GetProduct = async (req, res) => {
     try {
         const search = req.query.search || "";
+        const type = req.query.type
+        const sale = req.query.sale
         const skip = req.query.skip || 1;
         const limit = req.query.limit || 10;
         const query = {
             $match: {
+                ...(type && { typeProduct: type === "null" ? null : type }),
+                ...(type && { discount: sale === "sale" ? null : { $gt: 10 } }),
                 $or: [
                     { name: { $regex: search, $options: "i" } }
                 ]
@@ -66,9 +70,9 @@ const DeleteProduct = async (req, res) => {
                 message: "Information is missing"
             })
         }
-        await modelProduct.findByIdAndDelete({id})
+        await modelProduct.findByIdAndDelete({ id })
     } catch (error) {
         return res.status(500).json({ error })
     }
 }
-module.exports = { CreateProduct, GetProduct, GetProductDetail,DeleteProduct }
+module.exports = { CreateProduct, GetProduct, GetProductDetail, DeleteProduct }
