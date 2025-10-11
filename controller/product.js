@@ -30,7 +30,7 @@ const GetProduct = async (req, res) => {
         const query = {
             $match: {
                 ...(type && { typeProduct: type === "null" ? null : type }),
-                ...(sale && { discount: sale === "sale" ? null : { $gt: 10 } }),
+                ...(sale && { discount: sale === "null" ? null : { $gt: 10 } }),
                 $or: [
                     { name: { $regex: search, $options: "i" } }
                 ]
