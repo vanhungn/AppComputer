@@ -1,11 +1,13 @@
 require('dotenv').config();
 const modelUser = require('../model/user')
 const token = require("../helps/token")
+const Send = require('../helps/sendOtp')
 const { OAuth2Client } = require('google-auth-library')
 const bcrypt = require('bcrypt')
 const client_id = process.env.CLIENT_ID;
 const client = new OAuth2Client(client_id);
 const createToken = require('../helps/token');
+const ToE164 = require('../helps/transformPhone');
 const redisClient = require("../helps/redisClient");
 const axios = require("axios");
 
@@ -66,8 +68,8 @@ const Login = async (req, res) => {
                 message: 'Wrong password',
             });
         }
-        const newToken = await token({ id:users._id}, '15m', 'accessToken')
-         const refreshToken = await token({ id: users._id }, '7d', 'refreshToken');
+        const newToken = await token({ id: users._id }, '15m', 'accessToken')
+        const refreshToken = await token({ id: users._id }, '7d', 'refreshToken');
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,  // 🔒 chặn JS truy cập cookie
@@ -78,8 +80,29 @@ const Login = async (req, res) => {
         });
         return res.status(200).json({
             accessToken: newToken,
-            data: { name: users.name ,id:users._id}
-            
+            data: { name: users.name, id: users._id }
+
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error
+        })
+    }
+}
+const SendOtp = async (req, res) => {
+    try {
+        const { phone, email } = req.body;
+        if (!phone || !email) {
+            return res.status(400).json({
+                message: 'phone or email is not exist'
+            })
+        }
+        const ToE164Phone = await ToE164(phone)
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        await redisClient.setEx(`otp:${phone}`, 180, otp.toString());
+        await Send(ToE164Phone, `Your OTP code is: ${otp}`)
+        return res.status(200).json({
+            message: 'Send otp success'
         })
     } catch (error) {
         return res.status(500).json({
@@ -121,5 +144,6 @@ const sendEmail = async (req, res) => {
 module.exports = {
     LoginGoogle,
     Login,
+    SendOtp,
     sendEmail
 }

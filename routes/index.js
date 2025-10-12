@@ -1,11 +1,17 @@
 var express = require('express');
 var router = express.Router();
-const login =  require("../controller/login")
+
+const Check = require('../helps/checkPhoneEmail')
+const LoginGoogle = require('../controller/controllerLogin')
+const RefreshToken = require('../middleware/refreshToken')
+const VerifyOtp = require('../middleware/verifyotp')
 
 /* GET home page. */
-router.post("/login/google",login.LoginGoogle)
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
+router.get('/refreshToken', RefreshToken)
+router.post('/sendOTP', LoginGoogle.SendOtp)
+router.post('/loginGoogle', LoginGoogle.LoginGoogle)
+router.post('/login', LoginGoogle.Login)
+router.post('/sendEmail', LoginGoogle.sendEmail)
+router.post('/verifyOtp', VerifyOtp)
+router.post('/check', Check)
 module.exports = router;

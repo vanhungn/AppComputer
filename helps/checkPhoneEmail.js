@@ -1,4 +1,4 @@
-const modelUser = require('../model/modelUsers')
+const modelUser = require('../model/user')
 const CheckPhoneEmail = async (req, res) => {
     try {
         const { phone, email } = req.body
