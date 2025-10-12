@@ -48,13 +48,13 @@ const GetProduct = async (req, res) => {
 }
 const GetProductDetail = async (req, res) => {
     try {
-        const id = req.params
+        const { id } = req.params
         if (!id) {
             return res.status(404).json({
                 message: "Information is missing"
             })
         }
-        const data = await modelProduct.findById(id)
+        const data = await modelProduct.findById({ _id: id })
         return res.status(200).json({
             data
         })
