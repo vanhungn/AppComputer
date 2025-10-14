@@ -10,15 +10,15 @@ const Momo = async (req, res) => {
                 message: "invite"
             })
         }
-        const amounts = orders.reduce((a,b)=>a+b.totalPrice,0)
+        const amounts = orders.reduce((a, b) => a + b.totalPrice, 0)
         // Encode thành base64
         const extraDatas = Buffer.from(JSON.stringify(orders)).toString("base64");
         const accessKey = "F8BBA842ECF85";
         const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
         const orderInfo = "pay with MoMo";
         const partnerCode = "MOMO";
-        const redirectUrl = "https://shoe-122b.onrender.com/api/momo/notify";
-        const ipnUrl = "https://shoe-122b.onrender.com/api/momo/notify";
+        const redirectUrl = "https://appcomputer.onrender.com.com/api/momo/notify";
+        const ipnUrl = "https://appcomputer.onrender.com.com/api/momo/notify";
         const requestType = "payWithMethod";
         const amount = amounts;
         const orderId = partnerCode + new Date().getTime();
@@ -80,32 +80,32 @@ const Momo = async (req, res) => {
         });
     }
 };
-const CreateOrder = async(req,res)=>{
+const CreateOrder = async (req, res) => {
     try {
-         const { orderId, resultCode, transId, extraData } = req.query;
+        const { orderId, resultCode, transId, extraData } = req.query;
 
-    if (Number(resultCode) === 0) {
-      const orders = JSON.parse(Buffer.from(extraData, "base64").toString("utf-8"));
+        if (Number(resultCode) === 0) {
+            const orders = JSON.parse(Buffer.from(extraData, "base64").toString("utf-8"));
 
-      await modelOrder.insertMany(
-        orders.map(item => ({
-          idUser: item.idUser,
-          idProduct: item.idProduct,
-          quantity: item.quantity,
-          totalPrice: item.totalPrice,
-        }))
-      );
+            await modelOrder.insertMany(
+                orders.map(item => ({
+                    idUser: item.idUser,
+                    idProduct: item.idProduct,
+                    quantity: item.quantity,
+                    totalPrice: item.totalPrice,
+                }))
+            );
 
-      console.log("Orders created for orderId:", orderId);
-       } else {
-      console.log("Payment failed for orderId:", orderId);
-    }
+            console.log("Orders created for orderId:", orderId);
+        } else {
+            console.log("Payment failed for orderId:", orderId);
+        }
 
-    res.status(200).json({ message: "Received" });
+        res.status(200).json({ message: "Received" });
     } catch (error) {
-         return res.status(500).json({
+        return res.status(500).json({
             error: error.message,
         });
     }
 }
-module.exports = {Momo,CreateOrder};
+module.exports = { Momo, CreateOrder };
