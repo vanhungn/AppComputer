@@ -11,14 +11,12 @@ const CreateOrder = async (req, res) => {
         await modelOrder.insertMany(order.map(element => ({
             idUser: element.idUser,
             quantity: element.quantity,
-            color: element.color,
-            size: element.size,
-            img: element.img,
+
             totalPrice: element.totalPrice,
             status: "Chưa thanh toán",
             address: element.address,
-            payment:element.payment,
-            name:element.name
+            payment: element.payment,
+
         })));
         return res.status(200).json({
             message: "Success"
