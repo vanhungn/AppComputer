@@ -6,6 +6,7 @@ const SchemaProduct = new Schema({
     discount: Number,
     desc: String,
     typeProduct: String,
-    picture: [String]
+    picture: [String],
+    stock:Number
 }, { timestamps: true }, { collection: "products" })
 module.exports = mongoose.model("products", SchemaProduct)

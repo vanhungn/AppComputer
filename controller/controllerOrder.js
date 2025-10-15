@@ -1,5 +1,6 @@
 const modelOrder = require('../model/order')
 const modelProduct = require('../model/product')
+const mongoose = require('mongoose')
 const CreateOrder = async (req, res) => {
     try {
         const order = req.body
@@ -9,20 +10,24 @@ const CreateOrder = async (req, res) => {
                 message: "invite"
             })
         }
+
+
         await modelProduct.bulkWrite(
             order.map(item => ({
                 updateOne: {
                     filter: { _id: item.idProduct },
                     update: {
-                        $inc: { quantity: -item.quantity },  // giảm số lượng sản phẩm
+                        $inc: { stock: -item.quantity },
                         $set: { updatedAt: new Date() }
                     }
                 }
             }))
         );
+
+
         await modelOrder.insertMany(order.map(element => ({
             idUser: element.idUser,
-            idProduct:element.idProduct,
+            idProduct: element.idProduct,
             quantity: element.quantity,
 
             totalPrice: element.totalPrice,
