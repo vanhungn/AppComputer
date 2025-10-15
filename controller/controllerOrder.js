@@ -1,4 +1,5 @@
 const modelOrder = require('../model/order')
+const modelProduct = require('../model/product')
 const CreateOrder = async (req, res) => {
     try {
         const order = req.body
@@ -21,6 +22,7 @@ const CreateOrder = async (req, res) => {
         );
         await modelOrder.insertMany(order.map(element => ({
             idUser: element.idUser,
+            idProduct:element.idProduct,
             quantity: element.quantity,
 
             totalPrice: element.totalPrice,
