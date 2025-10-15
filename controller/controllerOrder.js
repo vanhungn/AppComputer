@@ -8,6 +8,17 @@ const CreateOrder = async (req, res) => {
                 message: "invite"
             })
         }
+        await modelProduct.bulkWrite(
+            order.map(item => ({
+                updateOne: {
+                    filter: { _id: item.idProduct },
+                    update: {
+                        $inc: { quantity: -item.quantity },  // giảm số lượng sản phẩm
+                        $set: { updatedAt: new Date() }
+                    }
+                }
+            }))
+        );
         await modelOrder.insertMany(order.map(element => ({
             idUser: element.idUser,
             quantity: element.quantity,

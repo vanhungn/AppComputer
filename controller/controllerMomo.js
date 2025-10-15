@@ -1,6 +1,7 @@
 const axios = require('axios');
 const crypto = require('crypto');
 const modelOrder = require('../model/order')
+const modelProduct = require('../model/product')
 
 const Momo = async (req, res) => {
     try {
@@ -86,16 +87,26 @@ const CreateOrder = async (req, res) => {
 
         if (Number(resultCode) === 0) {
             const orders = JSON.parse(Buffer.from(extraData, "base64").toString("utf-8"));
-
+            await modelProduct.bulkWrite(
+                orders.map(item => ({
+                    updateOne: {
+                        filter: { _id: item.idProduct },
+                        update: {
+                            $inc: { quantity: -item.quantity },  // giảm số lượng sản phẩm
+                            $set: { updatedAt: new Date() }
+                        }
+                    }
+                }))
+            );
             await modelOrder.insertMany(
                 orders.map(item => ({
                     idUser: item.idUser,
                     idProduct: item.idProduct,
                     quantity: item.quantity,
                     totalPrice: item.totalPrice,
-                    status : "Đã thanh toán",
-                    address:item.address,
-                    payment:item.payment
+                    status: "Đã thanh toán",
+                    address: item.address,
+                    payment: item.payment
                 }))
             );
 
