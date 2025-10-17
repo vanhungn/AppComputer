@@ -22,7 +22,7 @@ const upload = multer({
 });
 
 router.get('/get/user', verifyToken, checkRole, admin.GetUsers)
-router.get("/get/order", admin.GetOrder)
+router.get("/get/order", verifyToken, checkRole, admin.GetOrder)
 router.get('/detail/order/:_id', verifyToken, checkRole, admin.GetDetailOrder)
 router.get('/detail/user/:id', verifyToken, checkRole, admin.DetailUser)
 router.post('/create/user', verifyToken, checkRole, admin.CreateUser)

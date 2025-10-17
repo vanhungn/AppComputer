@@ -171,15 +171,11 @@ const UpdateUser = async (req, res) => {
 
 const GetOrder = async (req, res) => {
     try {
-        const search = req.query.search || ""
-        const skip = req.query.skip || 1
-        const limit = req.query.limit || 10
-        const querys = {
-            $match: {
+        const search = req.query.search?.trim() || "";
+        const skip = parseInt(req.query.skip) || 1;
+        const limit = parseInt(req.query.limit) || 10;
 
-            }
-        };
-        const order = await modelOrder.aggregate([querys,
+        const basePipeline = [
             {
                 $lookup: {
                     from: "users",
@@ -187,7 +183,6 @@ const GetOrder = async (req, res) => {
                     foreignField: "_id",
                     as: "infoUser"
                 }
-
             },
             {
                 $lookup: {
@@ -197,22 +192,36 @@ const GetOrder = async (req, res) => {
                     as: "infoProduct"
                 }
             },
+            { $unwind: "$infoProduct" },
+            {
+                $match: {
+                    $or: [
+                        { "infoProduct.name": { $regex: search === "" ? ".*" : search, $options: "i" } },
+                        { "infoUser.name": { $regex: search === "" ? ".*" : search, $options: "i" } }
+                    ]
+                }
+            }
+        ];
+
+        const order = await modelOrder.aggregate([
+            ...basePipeline,
             { $skip: (skip - 1) * limit },
             { $limit: limit }
-        ])
+        ]);
 
-        const lengthData = await modelOrder.aggregate([querys])
-        const total = Math.ceil(lengthData.length / limit)
-        return res.status(200).json({
-            data: order,
-            total
-        })
+        const lengthData = await modelOrder.aggregate([
+            ...basePipeline,
+        ]);
+
+        const total = Math.ceil(lengthData.length / limit);
+
+        return res.status(200).json({ data: order, total });
+
     } catch (error) {
-        return res.status(500).json({
-            error
-        })
+        return res.status(500).json({ error: error.message });
     }
-}
+};
+
 const GetDetailOrder = async (req, res) => {
     try {
         const { _id } = req.params
@@ -221,7 +230,7 @@ const GetDetailOrder = async (req, res) => {
                 message: "Information is missing"
             })
         }
-        const detail = await modelOrder.findById(_id)
+        const detail = await modelOrder.findById(_id).populate("idUser").populate("idProduct");
         return res.status(200).json({
             detail
         })
@@ -239,7 +248,7 @@ const deleteOrder = async (req, res) => {
                 message: "Information is missing"
             })
         }
-         await modelOrder.findByIdAndDelete({ _id })
+        await modelOrder.findByIdAndDelete({ _id })
 
         return res.status(200).json({
             message: "success"
