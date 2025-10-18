@@ -107,7 +107,7 @@ const CreateOrder = async (req, res) => {
                     status: "Đã thanh toán",
                     address: item.address,
                     payment: item.payment,
-                    origin:element.origin
+                    origin:item.origin
                 }))
             );
 
