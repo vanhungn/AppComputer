@@ -34,6 +34,7 @@ const CreateOrder = async (req, res) => {
             status: "Chưa thanh toán",
             address: element.address,
             payment: element.payment,
+            origin:element.origin
 
         })));
         return res.status(200).json({
