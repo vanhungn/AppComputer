@@ -21,15 +21,19 @@ const upload = multer({
     storage: storage,
 });
 
+router.get("/get/product", admin.GetProduct)
+router.get('/detail/product/:_id', admin.GetDetailProduct)
 router.get('/get/user', verifyToken, checkRole, admin.GetUsers)
 router.get("/get/order", verifyToken, checkRole, admin.GetOrder)
 router.get('/detail/order/:_id', verifyToken, checkRole, admin.GetDetailOrder)
 router.get('/detail/user/:id', verifyToken, checkRole, admin.DetailUser)
 router.post('/create/user', verifyToken, checkRole, admin.CreateUser)
 router.put('/update/order/:_id', admin.UpdateOrder)
+router.put('/update/product/:_id', upload.array("img", 10), admin.UpdateProduct)
 router.post('/login', admin.Login)
 router.post('/update/user', verifyToken, checkRole, admin.UpdateUser)
 router.delete('/delete/user/:id', verifyToken, checkRole, admin.DeleteUser)
 router.delete('/delete/order/:_id', verifyToken, checkRole, admin.deleteOrder)
+router.delete('/delete/product/:_id', admin.DeleteProduct)
 
 module.exports = router

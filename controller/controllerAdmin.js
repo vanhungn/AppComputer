@@ -3,6 +3,7 @@ const modelOrder = require("../model/order")
 const modelProduct = require('../model/product')
 const bcrypt = require('bcrypt')
 const token = require("../helps/token")
+const { options } = require("../routes")
 const cloudinary = require('cloudinary').v2;
 
 const Login = async (req, res) => {
@@ -284,6 +285,125 @@ const UpdateOrder = async (req, res) => {
         })
     }
 }
+
+const GetProduct = async (req, res) => {
+    try {
+
+        const search = req.query.search || ""
+        const skip = parseInt(req.query.skip) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const status = req.query.status
+        const queryProduct = {
+            $match: {
+                ...(status && { stock: status === "stock" ? { $gt: 0 } : { $eq: 0 } }),
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { origin: { $regex: search, $options: "i" } }
+                ]
+            }
+        }
+        const data = await modelProduct.aggregate([queryProduct,
+            { $skip: (skip - 1) * limit },
+            { $limit: limit }
+        ]
+        )
+        const lengthData = await modelProduct.aggregate([queryProduct])
+        const total = Math.ceil(lengthData.length / limit);
+        return res.status(200).json({
+            data, total, length: data.length
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
+const GetDetailProduct = async (req, res) => {
+    try {
+        const { _id } = req.params
+        if (!_id) {
+            return res.status(400).json({
+                message: "Information is missing"
+            })
+        }
+        const detail = await modelProduct.findById({ _id: _id })
+        return res.status(200).json({
+            detail
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
+const UpdateProduct = async (req, res) => {
+    try {
+        const { _id } = req.params
+        const files = req.files;
+        const { name, price, discount, desc, typeProduct, stock, origin } = req.body
+
+        if (!_id || !name || !price || !discount || !desc || !typeProduct || !stock || !origin) {
+            return res.status(400).json({
+                message: "Information is missing"
+            })
+        }
+        cloudinary.config({
+            cloud_name: "djybyg1o3",
+            api_key: "515998948284271",
+            api_secret: "53vkRUxGp4_JXSjQVIFfED6u-tk",
+            secure: true,
+        });
+
+        // Tìm đơn hàng cần update
+        const product = await modelProduct.findById(_id);
+        if (!product) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        // Nếu có upload ảnh mới
+        if (files && files.length > 0) {
+            // upload tất cả ảnh lên Cloudinary
+            const uploadedImages = await Promise.all(
+                files.map(async (file) => {
+                    const result = await cloudinary.uploader.upload(file.path);
+                    return result.secure_url;
+                })
+            );
+
+            // Gán danh sách ảnh mới vào order.img
+            product.picture = uploadedImages;
+            await product.save();
+        }
+        await modelProduct.findByIdAndUpdate({ _id: _id }, {
+            name, price, discount, desc, typeProduct, stock, origin
+        })
+        return res.status(200).json({
+            message: "success"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
+const DeleteProduct = async (req, res) => {
+    try {
+        const { _id } = req.params
+        if (!_id) {
+            return res.status(400).json({
+                message: "Information is missing"
+            })
+        }
+        await modelProduct.findByIdAndDelete({ _id: _id })
+        return res.status(200).json({
+            message: "success"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
 module.exports = {
     Login,
     GetUsers,
@@ -294,6 +414,10 @@ module.exports = {
     GetOrder,
     GetDetailOrder,
     deleteOrder,
-    UpdateOrder
+    UpdateOrder,
+    GetProduct,
+    GetDetailProduct,
+    UpdateProduct,
+    DeleteProduct
 
 }
