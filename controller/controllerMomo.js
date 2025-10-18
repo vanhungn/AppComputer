@@ -92,7 +92,7 @@ const CreateOrder = async (req, res) => {
                     updateOne: {
                         filter: { _id: item.idProduct },
                         update: {
-                            $inc: { quantity: -item.quantity },  // giảm số lượng sản phẩm
+                            $inc: { stock: -item.quantity },  // giảm số lượng sản phẩm
                             $set: { updatedAt: new Date() }
                         }
                     }
