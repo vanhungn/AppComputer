@@ -263,8 +263,8 @@ const UpdateOrder = async (req, res) => {
 
     try {
         const { _id } = req.params
-        const { quantity, idUser, idProduct, totalPrice, status, address, payment } = req.body
-        if (!quantity || !idUser || !idProduct || !totalPrice || !status || !address || !payment) {
+        const { quantity, totalPrice, status, address, payment } = req.body
+        if (!quantity || !totalPrice || !status || !address || !payment) {
             return res.status(400).json({
                 message: "Information is missing"
             })
