@@ -404,6 +404,51 @@ const DeleteProduct = async (req, res) => {
         })
     }
 }
+const CreateProduct = async (req, res) => {
+    try {
+        const { name, price, discount, typeProduct, origin, stock, desc } = req.body
+        const files = req.files
+        console.log(name, price, discount, typeProduct, origin, stock, desc)
+
+        if (!name || !price || !discount || !desc || !typeProduct || !stock || !origin) {
+            return res.status(400).json({
+                message: "Information is missing"
+            })
+        }
+        cloudinary.config({
+            cloud_name: "djybyg1o3",
+            api_key: "515998948284271",
+            api_secret: "53vkRUxGp4_JXSjQVIFfED6u-tk",
+            secure: true,
+        });
+        if (files && files.length > 0) {
+            const uploadedImages = await Promise.all(
+                files.map(async (file) => {
+                    const result = await cloudinary.uploader.upload(file.path);
+                    return result.secure_url; // trả về URL luôn
+                })
+            );
+
+            await modelProduct.create({
+                name,
+                price,
+                discount,
+                typeProduct,
+                origin,
+                stock,
+                desc,
+                picture: uploadedImages, // ảnh là mảng URL
+            });
+        }
+        return res.status(200).json({
+            message: "success"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
 module.exports = {
     Login,
     GetUsers,
@@ -418,6 +463,7 @@ module.exports = {
     GetProduct,
     GetDetailProduct,
     UpdateProduct,
-    DeleteProduct
+    DeleteProduct,
+    CreateProduct
 
 }
