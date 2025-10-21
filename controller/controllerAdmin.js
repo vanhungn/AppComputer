@@ -46,8 +46,8 @@ const Login = async (req, res) => {
 const GetUsers = async (req, res) => {
 
     try {
-        const skip = req.query.skip || 1
-        const limit = req.query.limit || 10
+        const skip = parseInt(req.query.skip) || 1
+        const limit = parseInt(req.query.limit) || 10
         const search = req.query.search || ""
         const query = {
             $match: {
@@ -408,17 +408,17 @@ const CreateProduct = async (req, res) => {
     try {
         const { name, price, discount, typeProduct, origin, stock, desc } = req.body
         const files = req.files
-        
+
 
         if (!name || !price || !discount || !desc || !typeProduct || !stock || !origin) {
             return res.status(400).json({
                 message: "Information is missing"
             })
         }
-        const checkName = await modelProduct.findOne({name:name})
-        if(checkName){
+        const checkName = await modelProduct.findOne({ name: name })
+        if (checkName) {
             return res.status(403).json({
-                message:"product already exists"
+                message: "product already exists"
             })
         }
         cloudinary.config({

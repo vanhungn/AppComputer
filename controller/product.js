@@ -25,8 +25,8 @@ const GetProduct = async (req, res) => {
         const search = req.query.search || "";
         const type = req.query.type
         const sale = req.query.sale
-        const skip = req.query.skip || 1;
-        const limit = req.query.limit || 10;
+        const skip = parseInt(req.query.skip) || 1;
+        const limit = parseInt(req.query.limit) || 10;
         const query = {
             $match: {
                 ...(type && { typeProduct: type === "null" ? null : type }),
