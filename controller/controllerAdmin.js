@@ -408,11 +408,17 @@ const CreateProduct = async (req, res) => {
     try {
         const { name, price, discount, typeProduct, origin, stock, desc } = req.body
         const files = req.files
-        console.log(name, price, discount, typeProduct, origin, stock, desc)
+        
 
         if (!name || !price || !discount || !desc || !typeProduct || !stock || !origin) {
             return res.status(400).json({
                 message: "Information is missing"
+            })
+        }
+        const checkName = await modelProduct.findOne({name:name})
+        if(checkName){
+            return res.status(403).json({
+                message:"product already exists"
             })
         }
         cloudinary.config({
