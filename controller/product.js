@@ -103,7 +103,7 @@ const RS = async (req, res) => {
         const suggestProduct = await modelProduct.find({
             typeProduct: product.typeProduct,
             _id: { $ne: id }
-        })
+        }).limit(5)
 
         return res.status(200).json({
             data: suggestProduct, length: suggestProduct.length
