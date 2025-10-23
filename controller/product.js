@@ -91,4 +91,31 @@ const DeleteProduct = async (req, res) => {
         return res.status(500).json({ error })
     }
 }
-module.exports = { CreateProduct, GetProduct, GetProductDetail, DeleteProduct }
+const RS = async (req, res) => {
+    try {
+        const { id } = req.params
+        if (!id) {
+            return res.status(404).json({
+                message: "Information is missing"
+            })
+        }
+        const product = await modelProduct.findById({ _id: id })
+        const suggestProduct = await modelProduct.find({
+            typeProduct: product.typeProduct,
+            _id: { $ne: id }
+        })
+
+        return res.status(200).json({
+            data: suggestProduct, length: suggestProduct.length
+        })
+    } catch (error) {
+        return res.status(500).json({ error })
+    }
+}
+module.exports = {
+    CreateProduct,
+    GetProduct,
+    GetProductDetail,
+    DeleteProduct,
+    RS
+}

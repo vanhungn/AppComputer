@@ -455,6 +455,7 @@ const CreateProduct = async (req, res) => {
         })
     }
 }
+
 module.exports = {
     Login,
     GetUsers,
