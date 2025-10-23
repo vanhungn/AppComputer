@@ -25,12 +25,16 @@ const GetProduct = async (req, res) => {
     try {
         const search = req.query.search || "";
         const type = req.query.type
+        const typeOrigin = req.query.typeOrigin
         const sale = req.query.sale
         const skip = parseInt(req.query.skip) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        console.log(type, typeOrigin)
         const query = {
             $match: {
+                stock: { $gt: 0 },
                 ...(type && { typeProduct: type === "null" ? null : type }),
+                ...(typeOrigin && { origin: type === "null" ? null : typeOrigin }),
                 ...(sale && { discount: sale === "null" ? null : { $gt: 10 } }),
                 $or: [
                     { name: { $regex: search, $options: "i" } }
