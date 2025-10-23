@@ -30,7 +30,7 @@ const CreateOrder = async (req, res) => {
             idProduct: element.idProduct,
             idEmployee:null,
             quantity: element.quantity,
-
+            approve:"Chưa duyệt",
             totalPrice: element.totalPrice,
             status: "Chưa thanh toán",
             address: element.address,

@@ -106,6 +106,7 @@ const CreateOrder = async (req, res) => {
                     quantity: item.quantity,
                     totalPrice: item.totalPrice,
                     status: "Đã thanh toán",
+                    approve: "Chưa duyệt",
                     address: item.address,
                     payment: item.payment,
                     origin: item.origin
