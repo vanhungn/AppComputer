@@ -153,10 +153,11 @@ const UpdateUser = async (req, res) => {
                 message: "Information is missing"
             })
         }
-
+        const salt = bcrypt.genSaltSync(10);
+        const hashPassWord = bcrypt.hashSync(password, salt);
         const data = await modelUser.findByIdAndUpdate({ _id: _id },
             {
-                name, phone, password, email, role
+                name, phone, hashPassWord, email, role
             }, { new: true }
         )
         return res.status(200).json({
@@ -431,7 +432,7 @@ const CreateProduct = async (req, res) => {
             const uploadedImages = await Promise.all(
                 files.map(async (file) => {
                     const result = await cloudinary.uploader.upload(file.path);
-                    return result.secure_url; // trả về URL luôn
+                    return result.secure_url;
                 })
             );
 
@@ -443,7 +444,7 @@ const CreateProduct = async (req, res) => {
                 origin,
                 stock,
                 desc,
-                picture: uploadedImages, // ảnh là mảng URL
+                picture: uploadedImages,
             });
         }
         return res.status(200).json({

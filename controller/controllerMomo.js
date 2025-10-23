@@ -101,13 +101,14 @@ const CreateOrder = async (req, res) => {
             await modelOrder.insertMany(
                 orders.map(item => ({
                     idUser: item.idUser,
+                    idEmployee: null,
                     idProduct: item.idProduct,
                     quantity: item.quantity,
                     totalPrice: item.totalPrice,
                     status: "Đã thanh toán",
                     address: item.address,
                     payment: item.payment,
-                    origin:item.origin
+                    origin: item.origin
                 }))
             );
 

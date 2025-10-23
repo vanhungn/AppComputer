@@ -28,6 +28,7 @@ const CreateOrder = async (req, res) => {
         await modelOrder.insertMany(order.map(element => ({
             idUser: element.idUser,
             idProduct: element.idProduct,
+            idEmployee:null,
             quantity: element.quantity,
 
             totalPrice: element.totalPrice,
