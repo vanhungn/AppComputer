@@ -39,8 +39,18 @@ const GetProduct = async (req, res) => {
         const data = await modelProduct.aggregate([query, { $skip: (skip - 1) * limit }, { $limit: limit }])
         const dataLength = await modelProduct.aggregate([query])
         const total = Math.ceil(dataLength.length / limit);
+        const typeOf = [];
+        const origin = [];
+        dataLength.forEach(item => {
+            if (!typeOf.includes(item.typeProduct)) {
+                typeOf.push(item.typeProduct)
+            }
+            if (!origin.includes(item.origin)) {
+                origin.push(item.origin)
+            }
+        })
         return res.status(200).json({
-            data, total, dataLength: dataLength.length
+            data, total, dataLength: dataLength.length, typeOf, origin
         })
     } catch (error) {
         return res.status(500).json({ error })
