@@ -1,3 +1,4 @@
+const { model } = require('mongoose')
 const { options } = require('../app')
 const modelProduct = require('../model/product')
 const CreateProduct = async (req, res) => {
@@ -39,9 +40,10 @@ const GetProduct = async (req, res) => {
         const data = await modelProduct.aggregate([query, { $skip: (skip - 1) * limit }, { $limit: limit }])
         const dataLength = await modelProduct.aggregate([query])
         const total = Math.ceil(dataLength.length / limit);
+        const datatype = await modelProduct.find({})
         const typeOf = [];
         const origin = [];
-        dataLength.forEach(item => {
+        datatype.forEach(item => {
             if (!typeOf.includes(item.typeProduct)) {
                 typeOf.push(item.typeProduct)
             }
