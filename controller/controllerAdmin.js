@@ -479,11 +479,11 @@ const Approve = async (req, res) => {
 }
 const GetEmployee = async (req, res) => {
     try {
-
+        const search = req.query.search || ""
         const employeeStats = await modelOrder.aggregate([
             {
                 $match: {
-                    approve: "Đã duyệt" // Chỉ lấy đơn hàng đã duyệt (tùy chọn)
+                    approve: "Đã duyệt",
                 }
             },
             {
@@ -515,6 +515,15 @@ const GetEmployee = async (req, res) => {
                 }
             },
             {
+                $match: {
+                    $or: [
+                        { employeeName: { $regex: search, $options: "i" } },
+                        { employeeEmail: { $regex: search, $options: "i" } },
+                        { monitorPhone: { $regex: search, $options: "i" } }
+                    ]
+                }
+            },
+            {
                 $sort: { totalRevenue: -1 }
             }
         ]);
@@ -529,10 +538,16 @@ const GetEmployee = async (req, res) => {
 }
 const GetMonitor = async (req, res) => {
     try {
+        const search = req.query.search || ""
         const monitorStats = await modelUser.aggregate([
             {
                 $match: {
-                    idMonitor: { $exists: true, $ne: [] } // Chỉ lấy user có người giám sát
+                    idMonitor: { $exists: true, $ne: [] },
+                    $or: [
+                        { name: { $regex: search, $options: "i" } },
+                        { email: { $regex: search, $options: "i" } },
+                        { phone: { $regex: search, $options: "i" } }
+                    ]
                 }
             },
             {
@@ -546,7 +561,7 @@ const GetMonitor = async (req, res) => {
                         {
                             $match: {
                                 $expr: { $eq: ["$idEmployee", "$$employeeId"] },
-                                approve: "Đã duyệt" // Chỉ đơn đã duyệt
+                                approve: "Đã duyệt",
                             }
                         }
                     ],
