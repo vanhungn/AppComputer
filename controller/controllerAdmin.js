@@ -477,6 +477,132 @@ const Approve = async (req, res) => {
         })
     }
 }
+const GetEmployee = async (req, res) => {
+    try {
+
+        const employeeStats = await modelOrder.aggregate([
+            {
+                $match: {
+                    approve: "Đã duyệt" // Chỉ lấy đơn hàng đã duyệt (tùy chọn)
+                }
+            },
+            {
+                $group: {
+                    _id: "$idEmployee",
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: { $sum: "$totalPrice" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "employeeInfo"
+                }
+            },
+            {
+                $unwind: "$employeeInfo"
+            },
+            {
+                $project: {
+                    _id: 1,
+                    employeeName: "$employeeInfo.name",
+                    employeeEmail: "$employeeInfo.email",
+                    monitorPhone: "$monitorInfo.phone",
+                    totalOrders: 1,
+                    totalRevenue: 1
+                }
+            },
+            {
+                $sort: { totalRevenue: -1 }
+            }
+        ]);
+        return res.status(200).json({
+            employeeStats
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
+const GetMonitor = async (req, res) => {
+    try {
+        const monitorStats = await modelUser.aggregate([
+            {
+                $match: {
+                    idMonitor: { $exists: true, $ne: [] } // Chỉ lấy user có người giám sát
+                }
+            },
+            {
+                $unwind: "$idMonitor" // Tách array idMonitor
+            },
+            {
+                $lookup: {
+                    from: "orders",
+                    let: { employeeId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ["$idEmployee", "$$employeeId"] },
+                                approve: "Đã duyệt" // Chỉ đơn đã duyệt
+                            }
+                        }
+                    ],
+                    as: "orders"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$orders",
+                    preserveNullAndEmptyArrays: true // Giữ nhân viên chưa có đơn
+                }
+            },
+            {
+                $group: {
+                    _id: "$idMonitor", // Nhóm theo người giám sát
+                    totalEmployees: { $addToSet: "$_id" }, // Danh sách nhân viên không trùng
+                    totalRevenue: { $sum: "$orders.totalPrice" } // Tổng doanh thu
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "monitorInfo"
+                }
+            },
+            {
+                $unwind: "$monitorInfo"
+            },
+            {
+                $project: {
+                    _id: 1,
+                    monitorName: "$monitorInfo.name",
+                    monitorEmail: "$monitorInfo.email",
+                    monitorPhone: "$monitorInfo.phone",
+                    totalEmployees: { $size: "$totalEmployees" }, // Đếm số nhân viên
+                    totalRevenue: 1
+                }
+            },
+            {
+                $sort: { totalRevenue: -1 }
+            }
+        ]);
+
+        console.log(monitorStats);
+        return res.status(200).json({
+            monitorStats
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
 module.exports = {
     Login,
     GetUsers,
@@ -493,5 +619,7 @@ module.exports = {
     UpdateProduct,
     DeleteProduct,
     CreateProduct,
-    Approve
+    Approve,
+    GetEmployee,
+    GetMonitor
 }

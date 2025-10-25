@@ -20,7 +20,8 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
 });
-
+router.get('/monitor', admin.GetMonitor)
+router.get('/employee', admin.GetEmployee)
 router.get("/get/product", verifyToken, checkRole, admin.GetProduct)
 router.get('/detail/product/:_id', verifyToken, checkRole, admin.GetDetailProduct)
 router.get('/get/user', verifyToken, checkRole, admin.GetUsers)
@@ -28,7 +29,7 @@ router.get("/get/order", verifyToken, checkRole, admin.GetOrder)
 router.get('/detail/order/:_id', verifyToken, checkRole, admin.GetDetailOrder)
 router.get('/detail/user/:id', verifyToken, checkRole, admin.DetailUser)
 router.post('/create/user', verifyToken, checkRole, admin.CreateUser)
-router.post("/approve/:_id",admin.Approve)
+router.post("/approve/:_id", admin.Approve)
 router.post('/create/product', upload.array("img", 10), admin.CreateProduct)
 router.put('/update/order/:_id', admin.UpdateOrder)
 router.put('/update/product/:_id', verifyToken, checkRole, upload.array("img", 10), admin.UpdateProduct)

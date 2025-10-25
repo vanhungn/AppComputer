@@ -7,8 +7,6 @@ const SchemaProduct = new Schema({
     googleId: String,
     email: String,
     role:String,
-    revenue:Number,
-    quantityOrder:Number,
     idMonitor:[{type:mongoose.Types.ObjectId,ref:"users"}]
 }, { timestamp: true }, { collection: "users" })
 module.exports = mongoose.model("users", SchemaProduct)
