@@ -509,7 +509,7 @@ const GetEmployee = async (req, res) => {
                     _id: 1,
                     employeeName: "$employeeInfo.name",
                     employeeEmail: "$employeeInfo.email",
-                    monitorPhone: "$monitorInfo.phone",
+                    monitorPhone: "$employeeInfo.phone",
                     totalOrders: 1,
                     totalRevenue: 1
                 }
