@@ -456,7 +456,27 @@ const CreateProduct = async (req, res) => {
         })
     }
 }
-
+const Approve = async (req, res) => {
+    try {
+        const { _id } = req.params
+        const { idEmployee } = req.body
+        if (!idEmployee) {
+            return res.status(400).json({
+                message: "Information is missing"
+            })
+        }
+        await modelOrder.findByIdAndUpdate({ _id }, {
+            approve: "Đã duyệt", idEmployee
+        })
+        return res.status(200).json({
+            message: "Thành công"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
 module.exports = {
     Login,
     GetUsers,
@@ -472,6 +492,6 @@ module.exports = {
     GetDetailProduct,
     UpdateProduct,
     DeleteProduct,
-    CreateProduct
-
+    CreateProduct,
+    Approve
 }
