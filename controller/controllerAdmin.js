@@ -609,7 +609,7 @@ const GetMonitor = async (req, res) => {
 
         console.log(monitorStats);
         return res.status(200).json({
-            monitorStats
+          employeeStats:  monitorStats
         })
 
     } catch (error) {
