@@ -157,7 +157,7 @@ const UpdateUser = async (req, res) => {
         const hashPassWord = bcrypt.hashSync(password, salt);
         const data = await modelUser.findByIdAndUpdate({ _id: _id },
             {
-                name, phone, hashPassWord, email, role
+                name, phone, password: hashPassWord, email, role
             }, { new: true }
         )
         return res.status(200).json({
@@ -609,7 +609,7 @@ const GetMonitor = async (req, res) => {
 
         console.log(monitorStats);
         return res.status(200).json({
-          employeeStats:  monitorStats
+            employeeStats: monitorStats
         })
 
     } catch (error) {
