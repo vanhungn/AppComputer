@@ -598,7 +598,7 @@ const GetMonitor = async (req, res) => {
                     monitorName: "$monitorInfo.name",
                     monitorEmail: "$monitorInfo.email",
                     monitorPhone: "$monitorInfo.phone",
-                    totalEmployees: { $size: "$totalEmployees" }, // Đếm số nhân viên
+                    totalOrders: { $size: "$totalEmployees" }, // Đếm số nhân viên
                     totalRevenue: 1
                 }
             },
