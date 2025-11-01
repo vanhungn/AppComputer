@@ -14,7 +14,7 @@ const Login = async (req, res) => {
                 message: "invite"
             })
         }
-        const user = await modelUser.findOne({ phone, role: "admin" })
+        const user = await modelUser.findOne({ phone})
         if (!user) {
             return res.status(404).json({
                 message: 'Phone does not exist',
