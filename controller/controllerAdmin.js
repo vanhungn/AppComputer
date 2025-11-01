@@ -508,7 +508,7 @@ const GetEmployee = async (req, res) => {
                 $project: {
                     _id: 1,
                     employeeName: "$employeeInfo.name",
-                    employeeEmail: "$employeeInfo.email",
+                    employeeName: "$employeeInfo.email",
                     monitorPhone: "$employeeInfo.phone",
                     totalOrders: 1,
                     totalRevenue: 1
@@ -595,8 +595,8 @@ const GetMonitor = async (req, res) => {
             {
                 $project: {
                     _id: 1,
-                    monitorName: "$monitorInfo.name",
-                    monitorEmail: "$monitorInfo.email",
+                    employeeName: "$monitorInfo.name",
+                    employeeName: "$monitorInfo.email",
                     monitorPhone: "$monitorInfo.phone",
                     totalOrders: { $size: "$totalEmployees" }, // Đếm số nhân viên
                     totalRevenue: 1
