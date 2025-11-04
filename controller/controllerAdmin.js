@@ -3,7 +3,6 @@ const modelOrder = require("../model/order")
 const modelProduct = require('../model/product')
 const bcrypt = require('bcrypt')
 const token = require("../helps/token")
-const { options } = require("../routes")
 const cloudinary = require('cloudinary').v2;
 
 const Login = async (req, res) => {
@@ -14,11 +13,16 @@ const Login = async (req, res) => {
                 message: "invite"
             })
         }
-        const user = await modelUser.findOne({ phone})
+        const user = await modelUser.findOne({ phone })
         if (!user) {
             return res.status(404).json({
                 message: 'Phone does not exist',
             });
+        }
+        if (user.role === "normal") {
+            return res.status(403).json({
+                message: "You are not an admin"
+            })
         }
         const isPassword = await bcrypt.compare(password, user.password)
         if (!isPassword) {
