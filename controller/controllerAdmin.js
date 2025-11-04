@@ -40,7 +40,7 @@ const Login = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         });
         return res.status(200).json({
-            accessToken: newToken,idUser:user._id
+            accessToken: newToken, idUser: user._id
         })
 
     } catch (error) {
@@ -622,6 +622,57 @@ const GetMonitor = async (req, res) => {
         })
     }
 }
+const DssRevenue = async (req, res) => {
+    try {
+        const result = await modelOrder.aggregate([
+            {
+                $match: { approve: "Đã duyệt" } // lọc đơn đã duyệt (nếu cần)
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" }
+                    },
+                    totalRevenue: { $sum: "$totalPrice" },
+                    totalOrders: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id.year": 1, "_id.month": 1 }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    month: {
+                        $concat: [
+                            { $toString: "$_id.year" },
+                            "-",
+                            {
+                                $cond: [
+                                    { $lt: ["$_id.month", 10] },
+                                    { $concat: ["0", { $toString: "$_id.month" }] },
+                                    { $toString: "$_id.month" }
+                                ]
+                            }
+                        ]
+                    },
+                    totalRevenue: 1,
+                    totalOrders: 1
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            result
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            error
+        })
+    }
+}
 module.exports = {
     Login,
     GetUsers,
@@ -640,5 +691,6 @@ module.exports = {
     CreateProduct,
     Approve,
     GetEmployee,
-    GetMonitor
+    GetMonitor,
+    DssRevenue
 }

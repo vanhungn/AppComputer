@@ -20,6 +20,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
 });
+router.get("/dss", admin.DssRevenue)
 router.get('/monitor', admin.GetMonitor)
 router.get('/employee', admin.GetEmployee)
 router.get("/get/product", verifyToken, checkRole, admin.GetProduct)
