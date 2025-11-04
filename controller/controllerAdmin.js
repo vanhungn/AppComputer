@@ -53,6 +53,7 @@ const GetUsers = async (req, res) => {
         const skip = parseInt(req.query.skip) || 1
         const limit = parseInt(req.query.limit) || 10
         const search = req.query.search || ""
+        const sort = parseInt(req.query.sort) || 1
         const query = {
             $match: {
                 $or: [
@@ -65,7 +66,9 @@ const GetUsers = async (req, res) => {
         const data = await modelUser.aggregate([query,
             { $skip: (skip - 1) * limit },
             { $limit: limit },
+            {$sort:{name:sort}},
             { $project: { password: 0 } },
+
         ])
         const lengthData = await modelUser.aggregate([query])
         const total = Math.ceil(lengthData.length / limit)
@@ -180,6 +183,8 @@ const GetOrder = async (req, res) => {
         const search = req.query.search?.trim() || "";
         const skip = parseInt(req.query.skip) || 1;
         const limit = parseInt(req.query.limit) || 10;
+        const status = req.query.status
+        const sort = parseInt(req.query.sort) || 1
 
         const basePipeline = [
             {
@@ -201,11 +206,15 @@ const GetOrder = async (req, res) => {
             { $unwind: "$infoProduct" },
             {
                 $match: {
+                    ...(status && { status: status === "da_thanh_toan" ? "Đã thanh toán" : "Chưa thanh toán" }),
                     $or: [
                         { "infoProduct.name": { $regex: search === "" ? ".*" : search, $options: "i" } },
                         { "infoUser.name": { $regex: search === "" ? ".*" : search, $options: "i" } }
                     ]
                 }
+            },
+            {
+                $sort: { createdAt: sort }
             }
         ];
 
@@ -298,6 +307,7 @@ const GetProduct = async (req, res) => {
         const skip = parseInt(req.query.skip) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const status = req.query.status
+        const sort = parseInt(req.query.sort) || 1
         const queryProduct = {
             $match: {
                 ...(status && { stock: status === "stock" ? { $gt: 0 } : { $eq: 0 } }),
@@ -309,7 +319,8 @@ const GetProduct = async (req, res) => {
         }
         const data = await modelProduct.aggregate([queryProduct,
             { $skip: (skip - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
+            { $sort: { updatedAt: sort } }
         ]
         )
         const lengthData = await modelProduct.aggregate([queryProduct])
@@ -678,6 +689,7 @@ const DssRevenue = async (req, res) => {
         })
     }
 }
+
 module.exports = {
     Login,
     GetUsers,
@@ -697,5 +709,6 @@ module.exports = {
     Approve,
     GetEmployee,
     GetMonitor,
-    DssRevenue
+    DssRevenue,
+   
 }
