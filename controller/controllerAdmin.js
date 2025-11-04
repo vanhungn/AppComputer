@@ -547,11 +547,7 @@ const GetMonitor = async (req, res) => {
             {
                 $match: {
                     idMonitor: { $exists: true, $ne: [] },
-                    $or: [
-                        { name: { $regex: search, $options: "i" } },
-                        { email: { $regex: search, $options: "i" } },
-                        { phone: { $regex: search, $options: "i" } }
-                    ]
+
                 }
             },
             {
@@ -604,6 +600,15 @@ const GetMonitor = async (req, res) => {
                     monitorPhone: "$monitorInfo.phone",
                     totalOrders: { $size: "$totalEmployees" }, // Đếm số nhân viên
                     totalRevenue: 1
+                }
+            },
+            {
+                $match: {
+                    $or: [
+                        { employeeName: { $regex: search, $options: "i" } },
+                        { employeeEmail: { $regex: search, $options: "i" } },
+                        { monitorPhone: { $regex: search, $options: "i" } }
+                    ]
                 }
             },
             {
