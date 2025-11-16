@@ -81,7 +81,7 @@ const Login = async (req, res) => {
         });
         return res.status(200).json({
             accessToken: newToken,
-            data: { name: users.name, id: users._id }
+            data: { name: users.name, id: users._id, role: users.role }
 
         })
     } catch (error) {
