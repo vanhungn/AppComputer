@@ -66,7 +66,7 @@ const GetUsers = async (req, res) => {
         const data = await modelUser.aggregate([query,
             { $skip: (skip - 1) * limit },
             { $limit: limit },
-            {$sort:{name:sort}},
+            { $sort: { name: sort } },
             { $project: { password: 0 } },
 
         ])
@@ -318,15 +318,16 @@ const GetProduct = async (req, res) => {
             }
         }
         const data = await modelProduct.aggregate([queryProduct,
+            { $sort: { updatedAt: sort } },
             { $skip: (skip - 1) * limit },
             { $limit: limit },
-            { $sort: { updatedAt: sort } }
+
         ]
         )
         const lengthData = await modelProduct.aggregate([queryProduct])
         const total = Math.ceil(lengthData.length / limit);
         return res.status(200).json({
-            data, total, length: data.length
+            data, total, length: lengthData.length
         })
     } catch (error) {
         return res.status(500).json({
@@ -710,5 +711,5 @@ module.exports = {
     GetEmployee,
     GetMonitor,
     DssRevenue,
-   
+
 }
