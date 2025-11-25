@@ -8,7 +8,7 @@ const VerifyOtp = require('../middleware/verifyotp')
 const MoMo = require('../controller/controllerMomo')
 
 /* GET home page. */
-router.get('/refreshToken', RefreshToken)
+router.post('/refreshToken', RefreshToken)
 router.post('/sendOTP', LoginGoogle.SendOtp)
 router.post('/loginGoogle', LoginGoogle.LoginGoogle)
 router.post('/login', LoginGoogle.Login)

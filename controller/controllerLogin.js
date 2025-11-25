@@ -54,40 +54,65 @@ const LoginGoogle = async (req, res) => {
         console.log(error)
     }
 }
+
 const Login = async (req, res) => {
     try {
         const { phone, password } = req.body;
-        const users = await modelUser.findOne({ phone })
+
+        // Kiểm tra input
+        if (!phone || !password) {
+            return res.status(400).json({
+                message: 'Vui lòng nhập đầy đủ số điện thoại và mật khẩu'
+            });
+        }
+
+        // Tìm user
+        const users = await modelUser.findOne({ phone });
         if (!users) {
-            return res.status(404).json({
-                message: 'Phone does not exist',
+            return res.status(401).json({
+                message: 'Số điện thoại không tồn tại'
             });
         }
-        const isPassword = await bcrypt.compare(password, users.password)
+
+        // Kiểm tra mật khẩu
+        const isPassword = await bcrypt.compare(password, users.password);
         if (!isPassword) {
-            return res.status(404).json({
-                message: 'Wrong password',
+            return res.status(401).json({
+                message: 'Sai mật khẩu'
             });
         }
-        const newToken = await token({ id: users._id }, '15m', 'accessToken')
-        const refreshToken = await token({ id: users._id }, '7d', 'refreshToken');
 
+        // Tạo tokens với payload đầy đủ hơn
+        const payload = {
+            id: users._id,
+            phone: users.phone,
+            role: users.role
+        };
+
+        const accessToken = await token(payload, '15m', 'accessToken');
+        const refreshToken = await token(payload, '7d', 'refreshToken');
+
+        // Set cookie với cấu hình đúng
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,  // 🔒 chặn JS truy cập cookie
-            secure: true,    // 🔒 chỉ gửi qua HTTPS (khi deploy)
-            sameSite: 'strict', // chống CSRF
-            path: '/',       // cookie dùng toàn site
-            maxAge: 1 * 24 * 60 * 60 * 1000
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // chỉ true khi deploy
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày khớp với token
         });
-        return res.status(200).json({
-            accessToken: newToken,
-            data: { name: users.name, id: users._id, role: users.role }
 
-        })
+        return res.status(200).json({
+            accessToken: accessToken,
+            data: { name: users.name, id: users._id, role: users.role }
+        });
+
     } catch (error) {
+        console.error('Login error:', error);
         return res.status(500).json({
-            message: error
-        })
+            success: false,
+            message: 'Lỗi server',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 }
 const SendOtp = async (req, res) => {
