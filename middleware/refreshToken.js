@@ -22,9 +22,9 @@ const RefreshToken = async (req, res) => {
 
         // Tạo payload có thông tin user
         const payload = {
-            userId: user._id,
-            email: user.email,
-            role: user.role // nếu có
+            id: user._id,
+            phone: user.phone,
+            role: user.role
         };
 
         // Tạo access token mới
@@ -33,7 +33,7 @@ const RefreshToken = async (req, res) => {
         return res.status(200).json({
             success: true,
             accessToken,
-            data: payload
+            data: { name: user.name, id: user._id, role: user.role }
         });
 
     } catch (error) {
