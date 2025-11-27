@@ -30,9 +30,10 @@ const RefreshToken = async (req, res) => {
         // Tạo access token mới
         const accessToken = await createToken(payload, '15m', 'accessToken');
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            accessToken
+            accessToken,
+            data: payload
         });
 
     } catch (error) {
