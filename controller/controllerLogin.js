@@ -28,11 +28,11 @@ const LoginGoogle = async (req, res) => {
         const accessToken = await createToken({ email, name }, '15m', 'accessToken')
         const refreshToken = await createToken({ email, name }, '1d', 'refreshToken')
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,  // 🔒 chặn JS truy cập cookie
-            secure: true,    // 🔒 chỉ gửi qua HTTPS (khi deploy)
-            sameSite: 'strict', // chống CSRF
-            path: '/',       // cookie dùng toàn site
-            maxAge: 1 * 24 * 60 * 60 * 1000
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // chỉ true khi deploy
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày khớp với token
         });
         if (!accout) {
             accout = await modelUser.create({
