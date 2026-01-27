@@ -482,7 +482,7 @@ const Approve = async (req, res) => {
             })
         }
         await modelOrder.findByIdAndUpdate({ _id }, {
-            approve: "Đã duyệt", idEmployee
+            approve: "Đã duyệt", idEmployee:idEmployee.id
         })
         return res.status(200).json({
             message: "Thành công"
