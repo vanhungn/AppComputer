@@ -1,31 +1,19 @@
-const redisClient = require("../helps/redisClient");
-
+const Otp = require('../model/otp')
 const VerifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    console.log("👉 Request body:", req.body);
 
-    if (!email || !otp) {
-      return res.status(400).json({ message: "email or OTP is missing" });
+    const record = await Otp.findOne({ email, otp });
+    if (!record) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    const storedOtp = await redisClient.get(`otp:${email}`);
+    await Otp.deleteOne({ _id: record._id });
 
-    if (!storedOtp) {
-      return res.status(400).json({ message: "OTP expired or not found" });
-    }
-
-    if (storedOtp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    await redisClient.del(`otp:${email}`);
-
-    return res.status(200).json({ message: "OTP verified successfully" });
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(200).json({ message: "OTP verified" });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
 };
 
-module.exports = VerifyOtp;
+module.exports = VerifyOtp

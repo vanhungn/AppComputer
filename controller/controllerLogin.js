@@ -10,6 +10,7 @@ const createToken = require('../helps/token');
 const ToE164 = require('../helps/transformPhone');
 const redisClient = require("../helps/redisClient");
 const axios = require("axios");
+const Otp= require('../model/otp')
 
 const verifyToken = async (token) => {
     const ticket = await client.verifyIdToken({
@@ -157,7 +158,7 @@ const sendEmail = async (req, res) => {
                 },
             }
         );
-        await redisClient.setEx(`otp:${email}`, 180, otp.toString());
+        await Otp.create({ email, otp });
         return res.status(200).json({
             message: 'Email has been sent',
         });
