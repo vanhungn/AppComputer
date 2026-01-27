@@ -29,7 +29,7 @@ const LoginGoogle = async (req, res) => {
         const refreshToken = await createToken({ email, name }, '1d', 'refreshToken')
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // chỉ true khi deploy
+            secure: true, // chỉ true khi deploy
             sameSite: 'strict',
             path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày khớp với token
