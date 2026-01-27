@@ -78,7 +78,7 @@ const Login = async (req, res) => {
         // Kiểm tra mật khẩu
         const isPassword = await bcrypt.compare(password, users.password);
         if (!isPassword) {
-            return res.status(401).json({
+            return res.status(404).json({
                 message: 'Sai mật khẩu'
             });
         }
